@@ -18,7 +18,7 @@ export class SweeterYouStack extends cdk.Stack {
     sweeterYouTable.addGlobalSecondaryIndex({
       indexName: "GenericGSI",
       partitionKey: { name: "SK_GSI_PK", type: dynamodb.AttributeType.STRING },
-      sortKey: { name: "SK_GSI_PK", type: dynamodb.AttributeType.STRING },
+      sortKey: { name: "GSI_SK", type: dynamodb.AttributeType.STRING },
       readCapacity: 5,
       writeCapacity: 5,
     });
