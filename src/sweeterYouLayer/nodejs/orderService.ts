@@ -14,9 +14,10 @@ type Order = {
 };
 
 /**
- * Creates a new order and saves it to the database
+ * Adds an id to newOrder and saves it to the database
  * @param newOrder Order to save to the database
  */
+
 export const createOrder = (newOrder: Order): Order => {
   if (!newOrder.Id) {
     newOrder.Id = nanoid();
