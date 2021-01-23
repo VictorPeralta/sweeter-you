@@ -4,13 +4,13 @@ import * as dynamodb from "@aws-cdk/aws-dynamodb";
 import * as apigw from "@aws-cdk/aws-apigatewayv2";
 import { LambdaProxyIntegration } from "@aws-cdk/aws-apigatewayv2-integrations";
 import { CfnOutput } from "@aws-cdk/core";
+import { syLambdaFunction } from "./syFunction";
 
 export class SweeterYouStack extends cdk.Stack {
   constructor(scope: cdk.Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
 
-    // The code that defines your stack goes here
-
+    //#region DynamoDB Table
     const sweeterYouTable = new dynamodb.Table(this, "SweeterYouTable", {
       partitionKey: { name: "PK", type: dynamodb.AttributeType.STRING },
       sortKey: { name: "SK_GSI_PK", type: dynamodb.AttributeType.STRING },
@@ -27,31 +27,9 @@ export class SweeterYouStack extends cdk.Stack {
       writeCapacity: 5,
     });
 
-    const helpersLayer = new lambda.LayerVersion(this, "SweeterYouLayer", {
-      code: lambda.Code.fromAsset("src/sweeterYouLayer"),
-      compatibleRuntimes: [lambda.Runtime.NODEJS_10_X],
-    });
+    //#endregion
 
-    const createOrderFunction = new lambda.Function(this, "CreateOrderFunction", {
-      code: lambda.Code.fromAsset("src/createOrderFunction"),
-      runtime: lambda.Runtime.NODEJS_10_X,
-      handler: "index.handler",
-      layers: [helpersLayer],
-      environment: { TABLE_NAME: sweeterYouTable.tableName },
-    });
-
-    sweeterYouTable.grantWriteData(createOrderFunction);
-
-    const getOrdersFunction = new lambda.Function(this, "getOrdersFunction", {
-      code: lambda.Code.fromAsset("src/getOrdersFunction"),
-      runtime: lambda.Runtime.NODEJS_10_X,
-      handler: "index.handler",
-      layers: [helpersLayer],
-      environment: { TABLE_NAME: sweeterYouTable.tableName },
-    });
-
-    sweeterYouTable.grantReadData(getOrdersFunction);
-
+    //#region API Gateway
     const restAPI = new apigw.HttpApi(this, "SweeterYouAPI", {
       corsPreflight: {
         allowMethods: [apigw.HttpMethod.POST, apigw.HttpMethod.GET],
@@ -67,6 +45,44 @@ export class SweeterYouStack extends cdk.Stack {
       stageName: "dev",
     });
 
+    //#endregion
+
+    //#region Lambda Layer
+    const helpersLayer = new lambda.LayerVersion(this, "SweeterYouLayer", {
+      code: lambda.Code.fromAsset("src/sweeterYouLayer"),
+      compatibleRuntimes: [lambda.Runtime.NODEJS_10_X],
+    });
+
+    //#endregion
+
+    //#region Order Functions
+    //#region  Functions
+    const createOrderFunction = new lambda.Function(this, "CreateOrderFunction", {
+      code: lambda.Code.fromAsset("src/orders/createOrderFunction"),
+      runtime: lambda.Runtime.NODEJS_10_X,
+      handler: "index.handler",
+      layers: [helpersLayer],
+      environment: { TABLE_NAME: sweeterYouTable.tableName },
+    });
+
+    const getOrdersFunction = new lambda.Function(this, "getOrdersFunction", {
+      code: lambda.Code.fromAsset("src/orders/getOrdersFunction"),
+      runtime: lambda.Runtime.NODEJS_10_X,
+      handler: "index.handler",
+      layers: [helpersLayer],
+      environment: { TABLE_NAME: sweeterYouTable.tableName },
+    });
+
+    //#endregion
+
+    //#region Function Permissions
+
+    sweeterYouTable.grantWriteData(createOrderFunction);
+    sweeterYouTable.grantReadData(getOrdersFunction);
+
+    //#endregion
+
+    //#region  API integration
     const createOrderIntegration = new LambdaProxyIntegration({
       handler: createOrderFunction,
       payloadFormatVersion: apigw.PayloadFormatVersion.VERSION_2_0,
@@ -89,8 +105,47 @@ export class SweeterYouStack extends cdk.Stack {
       integration: getOrdersIntegration,
     });
 
+    //#endregion
+
+    //#endregion
+
+    //#region Product Functions
+    //#region  Functions
+    const createProductFunction = new syLambdaFunction(this, "syCreateProductFunction", {
+      functionId: "CreateProductFunction",
+      layers: [helpersLayer],
+      srcPath: "src/products/createProductFunction",
+      tableName: sweeterYouTable.tableName,
+    });
+
+    //#endregion
+
+    //#region Function Permissions
+
+    sweeterYouTable.grantWriteData(createProductFunction.function);
+
+    //#endregion
+
+    //#region  API integration
+    const createProductIntegration = new LambdaProxyIntegration({
+      handler: createProductFunction.function,
+      payloadFormatVersion: apigw.PayloadFormatVersion.VERSION_2_0,
+    });
+
+    restAPI.addRoutes({
+      path: "/products",
+      methods: [apigw.HttpMethod.POST],
+      integration: createProductIntegration,
+    });
+
+    //#endregion
+
+    //#endregion
+
+    //#region Outputs
     new CfnOutput(this, "DevStgUrl", {
       value: devStg.url,
     });
+    //#endregion
   }
 }

@@ -26,7 +26,7 @@ export type Order = {
 
 export const createOrder = async (newOrder: Order): Promise<Order> => {
   if (!newOrder.Id) {
-    newOrder.Id = nanoid();
+    newOrder.Id = "ORDER-" + nanoid();
   }
 
   await saveOrderDetails(newOrder);
