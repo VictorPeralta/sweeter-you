@@ -1,8 +1,8 @@
-import * as aws from "aws-sdk";
 import { ItemList } from "aws-sdk/clients/dynamodb";
+import DynamoDB = require("aws-sdk/clients/dynamodb");
 
-const docClient = new aws.DynamoDB.DocumentClient();
-
+const docClient = new DynamoDB.DocumentClient();
+console.log("Creating docClient");
 export interface IPutItem {
   PK: unknown;
   SK_GSI_PK: unknown;
