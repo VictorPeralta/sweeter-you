@@ -42,7 +42,7 @@ const saveOrderDetails = async (order: Order) => {
     PK,
     SK_GSI_PK,
     GSI_SK,
-    item,
+    ...item,
   };
 
   await orderTable.put(orderToSave);
