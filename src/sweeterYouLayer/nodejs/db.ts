@@ -34,8 +34,9 @@ export class Table {
     sortKey?: string,
     indexName?: string
   ): Promise<ItemList | undefined> {
-    const KeyConditionExpression = `${pkName} = :partition` + (skName && sortKey ? `and ${skName} = :sort` : "");
-    const ExpressionAttributeValues: any = {
+    const KeyConditionExpression: DynamoDB.KeyExpression =
+      `${pkName} = :partition` + (skName && sortKey ? `and ${skName} = :sort` : "");
+    const ExpressionAttributeValues: DynamoDB.DocumentClient.ExpressionAttributeValueMap = {
       ":partition": partitionkey,
     };
 
