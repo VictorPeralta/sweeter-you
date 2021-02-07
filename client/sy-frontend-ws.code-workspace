@@ -5,13 +5,11 @@
     }
   ],
   "settings": {
-    "files.exclude": {
-      "**/*.js": true
-    },
+    "workbench.colorTheme": "One Dark Pro",
     "workbench.colorCustomizations": {
-      "titleBar.activeBackground": "#63acff",
+      "titleBar.activeBackground": "#e220c8",
       "titleBar.activeForeground": "#000",
-      "titleBar.inactiveBackground": "#3493ff",
+      "titleBar.inactiveBackground": "#b6079f",
       "titleBar.inactiveForeground": "#000"
     }
   }
