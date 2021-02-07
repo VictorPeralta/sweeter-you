@@ -23,5 +23,5 @@
       "/opt/nodejs/*": ["src/sweeterYouLayer/nodejs/*"]
     }
   },
-  "exclude": ["cdk.out"]
+  "exclude": ["cdk.out", "client"]
 }

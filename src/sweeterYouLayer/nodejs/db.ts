@@ -50,4 +50,13 @@ export class Table {
     const response = await docClient.query(params).promise();
     return response.Items;
   }
+
+  async scan(indexName?: string): Promise<ItemList | undefined> {
+    const IndexName = indexName;
+
+    const params = { TableName: this.tablename, IndexName };
+
+    const response = await docClient.scan(params).promise();
+    return response.Items;
+  }
 }
