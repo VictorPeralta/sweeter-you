@@ -5,6 +5,7 @@ import * as apigw from "@aws-cdk/aws-apigatewayv2";
 import { LambdaProxyIntegration } from "@aws-cdk/aws-apigatewayv2-integrations";
 import { CfnOutput } from "@aws-cdk/core";
 import { syLambdaFunction } from "./syFunction";
+import { Bucket, HttpMethods } from "@aws-cdk/aws-s3";
 
 export class SweeterYouStack extends cdk.Stack {
   constructor(scope: cdk.Construct, id: string, props?: cdk.StackProps) {
@@ -25,6 +26,13 @@ export class SweeterYouStack extends cdk.Stack {
       sortKey: { name: "GSI_SK", type: dynamodb.AttributeType.STRING },
       readCapacity: 5,
       writeCapacity: 5,
+    });
+
+    //#endregion
+
+    //#region S3 Bucket
+    const syBucket = new Bucket(this, "syBucket", {
+      cors: [{ allowedMethods: [HttpMethods.GET, HttpMethods.PUT], allowedOrigins: ["*"], allowedHeaders: ["*"] }],
     });
 
     //#endregion
@@ -52,6 +60,25 @@ export class SweeterYouStack extends cdk.Stack {
       code: lambda.Code.fromAsset("src/sweeterYouLayer"),
       compatibleRuntimes: [lambda.Runtime.NODEJS_10_X],
     });
+
+    //#endregion
+
+    //#region S3 Functions
+    const s3PutSignedUrlFunction = new syLambdaFunction(this, "syS3PutSignedUrlFunction", {
+      functionId: "S3PutSignedUrlFunction",
+      srcPath: "src/s3/putSignedUrl",
+      env: { BUCKET_NAME: syBucket.bucketName },
+    });
+
+    syBucket.grantPut(s3PutSignedUrlFunction.function);
+
+    //#region API Integration
+    restAPI.addRoutes({
+      path: "/putS3Url",
+      integration: s3PutSignedUrlFunction.httpIntegration,
+      methods: [apigw.HttpMethod.GET],
+    });
+    //#endregion
 
     //#endregion
 
@@ -134,24 +161,14 @@ export class SweeterYouStack extends cdk.Stack {
     //#endregion
 
     //#region  API integration
-    const createProductIntegration = new LambdaProxyIntegration({
-      handler: createProductFunction.function,
-      payloadFormatVersion: apigw.PayloadFormatVersion.VERSION_2_0,
-    });
-
     restAPI.addRoutes({
       path: "/products",
       methods: [apigw.HttpMethod.POST],
-      integration: createProductIntegration,
-    });
-
-    const getProductsIntegration = new LambdaProxyIntegration({
-      handler: getProductsFunction.function,
-      payloadFormatVersion: apigw.PayloadFormatVersion.VERSION_2_0,
+      integration: createProductFunction.httpIntegration,
     });
 
     restAPI.addRoutes({
-      integration: getProductsIntegration,
+      integration: getProductsFunction.httpIntegration,
       methods: [apigw.HttpMethod.GET],
       path: "/products",
     });
