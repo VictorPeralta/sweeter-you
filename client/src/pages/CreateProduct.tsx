@@ -1,6 +1,19 @@
 import React, { useState, ChangeEvent } from "react";
-import { FormLabel, Input, FormControl, Container } from "@chakra-ui/react";
+import {
+  FormLabel,
+  Input,
+  FormControl,
+  Container,
+  Button,
+  Stack,
+  Box,
+  Flex,
+  Image,
+  FormHelperText,
+  Center,
+} from "@chakra-ui/react";
 import { GetPresignedPutURL } from "../services/s3service";
+import { CreateProduct as CreateProductFunction } from "../services/productService";
 
 export default function CreateProduct() {
   const [name, setName] = useState("");
@@ -35,24 +48,63 @@ export default function CreateProduct() {
   }
 
   return (
-    <Container>
-      <FormControl>
-        <FormLabel>Product Name</FormLabel>
-        <Input value={name} onChange={(e) => setName(e.target.value)}></Input>
-      </FormControl>
-      <FormControl>
-        <FormLabel>Price</FormLabel>
-        <Input value={price.toString()} type="number" onChange={(e) => setPrice(+e.target.value)}></Input>
-      </FormControl>
-      <FormControl>
-        <FormLabel>Description</FormLabel>
-        <Input value={description} onChange={(e) => setDescription(e.target.value)}></Input>
-      </FormControl>
-      <FormControl>
-        <FormLabel>Image</FormLabel>
-        <Input type="file" onChange={handleImageUpload}></Input>
-      </FormControl>
-      <img src={imgUrl} alt="Chosen product thumbnail" />
-    </Container>
+    <form
+      onSubmit={(e) => {
+        e.preventDefault();
+        console.log("submit");
+        CreateProductFunction({ Name: name, Price: price, Description: description, ImageURL: imgUrl });
+      }}
+    >
+      <Container maxW={"1200px"}>
+        <Flex>
+          <Box w="50%">
+            <FormControl h="100%">
+              <FormLabel h="100%">
+                <Flex direction="column" justifyContent="space-between" h="100%">
+                  {imgUrl ? (
+                    <Center>
+                      <Box>
+                        <Image src={imgUrl} alt="Chosen product thumbnail" maxH="260px" cursor={"pointer"} />
+                      </Box>
+                    </Center>
+                  ) : (
+                    <Flex
+                      flexGrow={1}
+                      backgroundColor="gray.50"
+                      textAlign="center"
+                      cursor={"pointer"}
+                      borderRadius={6}
+                      direction="column"
+                      justifyContent="center"
+                    ></Flex>
+                  )}
+                  <FormHelperText textAlign="center">Click to upload new image</FormHelperText>
+                </Flex>
+              </FormLabel>
+              <Input type="file" display="none" onChange={handleImageUpload}></Input>
+            </FormControl>
+          </Box>
+          <Box w="50%">
+            <Stack>
+              <FormControl>
+                <FormLabel>Product Name</FormLabel>
+                <Input value={name} onChange={(e) => setName(e.target.value)}></Input>
+              </FormControl>
+              <FormControl>
+                <FormLabel>Price</FormLabel>
+                <Input value={price.toString()} type="number" onChange={(e) => setPrice(+e.target.value)}></Input>
+              </FormControl>
+              <FormControl>
+                <FormLabel>Description</FormLabel>
+                <Input value={description} onChange={(e) => setDescription(e.target.value)}></Input>
+              </FormControl>
+              <Button type="submit" colorScheme="pink">
+                Submit
+              </Button>
+            </Stack>
+          </Box>
+        </Flex>
+      </Container>
+    </form>
   );
 }
