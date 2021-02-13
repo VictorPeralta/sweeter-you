@@ -1,6 +1,6 @@
-import React, { ReactNode } from "react";
+import React from "react";
 import { Box, Container, Link } from "@chakra-ui/react";
-import { Link as RouterLink, RouteProps, Route, useRouteMatch } from "react-router-dom";
+import { Link as RouterLink, Route, useRouteMatch } from "react-router-dom";
 import OpenOrders from "../pages/OpenOrders";
 import Products from "../pages/Products";
 import CreateProduct from "../pages/CreateProduct";
