@@ -1,6 +1,7 @@
 import React from "react";
-import { Table, Thead, Tr, Th, Tbody, Td, Button } from "@chakra-ui/react";
+import { Table, Thead, Tr, Th, Tbody, Td, Text } from "@chakra-ui/react";
 import { Order } from "../../../../types/Order";
+import { Link } from "react-router-dom";
 
 const OrderTable = ({ openOrders }: { openOrders: Order[] }) => {
   return (
@@ -31,8 +32,12 @@ const OrderTable = ({ openOrders }: { openOrders: Order[] }) => {
                         year: "numeric",
                       })}
                     </Td>
-                    <Td>
-                      <Button>Detalles</Button>
+                    <Td textAlign="right">
+                      <Link to={`/admin/products/edit/${order.Id}`}>
+                        <Text textColor="pink.400" _hover={{ textColor: "pink.500" }}>
+                          Details
+                        </Text>
+                      </Link>
                     </Td>
                   </Tr>
                 );

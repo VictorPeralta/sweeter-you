@@ -1,25 +1,20 @@
 import * as React from "react";
-import { ChakraProvider, Box, theme } from "@chakra-ui/react";
-import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
-import OpenOrders from "./pages/OpenOrders";
-import Products from "./pages/Products";
-import CreateProduct from "./pages/CreateProduct";
+import { ChakraProvider, Box, theme, Link } from "@chakra-ui/react";
+import { BrowserRouter as Router, Switch, Route, Link as RouterLink } from "react-router-dom";
+import Sidebar from "./components/Sidebar";
+import Navbar from "./components/Navbar";
 
 export const App = () => (
   <ChakraProvider theme={theme}>
     <Router>
-      <Switch>
-        <Route exact path="/admin/orders">
-          <OpenOrders />
-        </Route>
-        <Route exact path="/admin/products">
-          <Products />
-        </Route>
-        <Route exact path="/admin/products/create">
-          <CreateProduct />
-        </Route>
-      </Switch>
+      <Box h="100vh" display="flex" flexDirection="column">
+        <Navbar />
+        <Switch>
+          <Route path="/admin">
+            <Sidebar />
+          </Route>
+        </Switch>
+      </Box>
     </Router>
-    <Box></Box>
   </ChakraProvider>
 );

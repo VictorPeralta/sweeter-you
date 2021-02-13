@@ -5,7 +5,7 @@ export async function GetProducts(): Promise<Product[]> {
   const res = await fetch(`${config.baseUrl}/products`);
   const data = await res.json();
   console.log(data);
-  return JSON.parse(data);
+  return data;
 }
 
 export async function CreateProduct(newProduct: Product): Promise<Product> {

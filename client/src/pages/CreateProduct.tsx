@@ -28,7 +28,7 @@ export default function CreateProduct() {
       const fileType = fileSections[fileSections.length - 1];
       const presignedUrl = await GetPresignedPutURL(fileType);
 
-      //Turn this into await async
+      // Turn this into await async and move into s3 service
       fetch(presignedUrl, {
         method: "PUT",
         body: file,
@@ -64,7 +64,7 @@ export default function CreateProduct() {
                   {imgUrl ? (
                     <Center>
                       <Box>
-                        <Image src={imgUrl} alt="Chosen product thumbnail" maxH="260px" cursor={"pointer"} />
+                        <Image src={imgUrl} alt="Chosen product thumbnail" maxH="64" cursor={"pointer"} />
                       </Box>
                     </Center>
                   ) : (
