@@ -40,7 +40,7 @@ export class SweeterYouStack extends cdk.Stack {
     //#region API Gateway
     const restAPI = new apigw.HttpApi(this, "SweeterYouAPI", {
       corsPreflight: {
-        allowMethods: [apigw.HttpMethod.POST, apigw.HttpMethod.GET],
+        allowMethods: [apigw.HttpMethod.POST, apigw.HttpMethod.GET, apigw.HttpMethod.PUT, apigw.HttpMethod.DELETE],
         allowOrigins: ["*"],
         allowHeaders: ["*"],
       },
@@ -183,6 +183,18 @@ export class SweeterYouStack extends cdk.Stack {
       },
     });
 
+    const deleteProductFunction = new syLambdaFunction(this, "syDeleteProductFunction", {
+      api: {
+        httpApi: restAPI,
+        methods: [apigw.HttpMethod.DELETE],
+        path: "/products/{productId}",
+      },
+      functionId: "DeleteProductFunction",
+      srcPath: "src/products/delete",
+      tableName: sweeterYouTable.tableName,
+      layers: [helpersLayer],
+    });
+
     //#endregion
 
     //#region Function Permissions
@@ -191,6 +203,7 @@ export class SweeterYouStack extends cdk.Stack {
     sweeterYouTable.grantReadData(getProductsFunction.function);
     sweeterYouTable.grantWriteData(editProductFunction.function);
     sweeterYouTable.grantReadData(getProductFunction.function);
+    sweeterYouTable.grantWriteData(deleteProductFunction.function);
     //#endregion
 
     //#endregion

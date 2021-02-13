@@ -70,4 +70,12 @@ export class Table {
     const response = await docClient.get(params).promise();
     return response.Item;
   }
+
+  async delete(hashKey: IKeyValue, sortKey: IKeyValue, conditionalKey: string): Promise<boolean> {
+    const Key = { ...hashKey, ...sortKey };
+    const ConditionExpression = `attribute_exists (${conditionalKey})`;
+    const params = { TableName: this.tablename, Key, ConditionExpression };
+    await docClient.delete(params).promise();
+    return true;
+  }
 }

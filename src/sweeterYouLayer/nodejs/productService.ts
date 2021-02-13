@@ -69,3 +69,7 @@ export const getSingleProduct = async (productId: string): Promise<Product> => {
   };
   return product;
 };
+
+export const deleteProduct = async (productId: string): Promise<boolean> => {
+  return await productTable.delete({ PK: "Products" }, { SK_GSI_PK: productId }, "SK_GSI_PK");
+};
