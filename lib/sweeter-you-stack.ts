@@ -68,17 +68,14 @@ export class SweeterYouStack extends cdk.Stack {
       functionId: "S3PutSignedUrlFunction",
       srcPath: "src/s3/putSignedUrl",
       env: { BUCKET_NAME: syBucket.bucketName },
+      api: {
+        httpApi: restAPI,
+        path: "/putS3Url",
+        methods: [apigw.HttpMethod.GET],
+      },
     });
 
     syBucket.grantPut(s3PutSignedUrlFunction.function);
-
-    //#region API Integration
-    restAPI.addRoutes({
-      path: "/putS3Url",
-      integration: s3PutSignedUrlFunction.httpIntegration,
-      methods: [apigw.HttpMethod.GET],
-    });
-    //#endregion
 
     //#endregion
 
@@ -143,6 +140,11 @@ export class SweeterYouStack extends cdk.Stack {
       layers: [helpersLayer],
       srcPath: "src/products/createProductFunction",
       tableName: sweeterYouTable.tableName,
+      api: {
+        httpApi: restAPI,
+        methods: [apigw.HttpMethod.POST],
+        path: "/products",
+      },
     });
 
     const getProductsFunction = new syLambdaFunction(this, "syGetProductsFunction", {
@@ -150,6 +152,11 @@ export class SweeterYouStack extends cdk.Stack {
       layers: [helpersLayer],
       srcPath: "src/products/getProductsFunction",
       tableName: sweeterYouTable.tableName,
+      api: {
+        httpApi: restAPI,
+        methods: [apigw.HttpMethod.GET],
+        path: "/products/{productId}",
+      },
     });
 
     const editProductFunction = new syLambdaFunction(this, "syEditProductFunction", {
@@ -157,6 +164,11 @@ export class SweeterYouStack extends cdk.Stack {
       layers: [helpersLayer],
       srcPath: "src/products/editProductFunction",
       tableName: sweeterYouTable.tableName,
+      api: {
+        httpApi: restAPI,
+        methods: [apigw.HttpMethod.PUT],
+        path: "/products/{productId}",
+      },
     });
 
     //#endregion
@@ -166,27 +178,6 @@ export class SweeterYouStack extends cdk.Stack {
     sweeterYouTable.grantWriteData(createProductFunction.function);
     sweeterYouTable.grantReadData(getProductsFunction.function);
     sweeterYouTable.grantWriteData(editProductFunction.function);
-    //#endregion
-
-    //#region  API integration
-    restAPI.addRoutes({
-      path: "/products",
-      methods: [apigw.HttpMethod.POST],
-      integration: createProductFunction.httpIntegration,
-    });
-
-    restAPI.addRoutes({
-      integration: getProductsFunction.httpIntegration,
-      methods: [apigw.HttpMethod.GET],
-      path: "/products",
-    });
-
-    restAPI.addRoutes({
-      integration: editProductFunction.httpIntegration,
-      methods: [apigw.HttpMethod.PUT],
-      path: "/products/{productId}",
-    });
-
     //#endregion
 
     //#endregion

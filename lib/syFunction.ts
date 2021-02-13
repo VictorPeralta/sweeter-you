@@ -2,6 +2,13 @@ import * as cdk from "@aws-cdk/core";
 import * as lambda from "@aws-cdk/aws-lambda";
 import { LambdaProxyIntegration } from "@aws-cdk/aws-apigatewayv2-integrations";
 import { PayloadFormatVersion } from "@aws-cdk/aws-apigatewayv2";
+import { HttpMethod, HttpApi } from "@aws-cdk/aws-apigatewayv2";
+
+interface syApiProps {
+  httpApi: HttpApi;
+  path: string;
+  methods: HttpMethod[];
+}
 
 export interface syFunctionProps {
   srcPath: string;
@@ -9,6 +16,7 @@ export interface syFunctionProps {
   functionId: string;
   tableName?: string;
   env?: Record<string, unknown>;
+  api: syApiProps;
 }
 
 export class syLambdaFunction extends cdk.Construct {
@@ -33,6 +41,12 @@ export class syLambdaFunction extends cdk.Construct {
     this.httpIntegration = new LambdaProxyIntegration({
       handler: this.function,
       payloadFormatVersion: PayloadFormatVersion.VERSION_2_0,
+    });
+
+    props.api.httpApi.addRoutes({
+      path: props.api.path,
+      methods: props.api.methods,
+      integration: this.httpIntegration,
     });
   }
 }
