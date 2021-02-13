@@ -22,6 +22,7 @@ export const handler: APIGatewayProxyHandlerV2 = async (event) => {
     response = {
       body: JSON.stringify(newProduct),
       statusCode: 200,
+      headers: { "Content-Type": "application/json" },
     };
   } catch (error) {
     console.error(error);

@@ -5,12 +5,11 @@ export const handler: APIGatewayProxyHandlerV2 = async (event) => {
   console.log(event);
   if (event.queryStringParameters?.status === "open") {
     const orders = await getOpenOrders();
-    return {
-      body: JSON.stringify(orders),
-    };
+    return JSON.stringify(orders);
   }
 
   return {
-    body: JSON.stringify(event),
+    statusCode: 400,
+    body: "Request is invalid",
   };
 };

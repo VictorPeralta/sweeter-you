@@ -152,12 +152,20 @@ export class SweeterYouStack extends cdk.Stack {
       tableName: sweeterYouTable.tableName,
     });
 
+    const editProductFunction = new syLambdaFunction(this, "syEditProductFunction", {
+      functionId: "EditProductFunction",
+      layers: [helpersLayer],
+      srcPath: "src/products/editProductFunction",
+      tableName: sweeterYouTable.tableName,
+    });
+
     //#endregion
 
     //#region Function Permissions
 
     sweeterYouTable.grantWriteData(createProductFunction.function);
     sweeterYouTable.grantReadData(getProductsFunction.function);
+    sweeterYouTable.grantWriteData(editProductFunction.function);
     //#endregion
 
     //#region  API integration
@@ -171,6 +179,12 @@ export class SweeterYouStack extends cdk.Stack {
       integration: getProductsFunction.httpIntegration,
       methods: [apigw.HttpMethod.GET],
       path: "/products",
+    });
+
+    restAPI.addRoutes({
+      integration: editProductFunction.httpIntegration,
+      methods: [apigw.HttpMethod.PUT],
+      path: "/products/{productId}",
     });
 
     //#endregion

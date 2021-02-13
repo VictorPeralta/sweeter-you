@@ -1,5 +1,6 @@
 import * as db from "./db";
 import { Product } from "types/Product";
+import { nanoid } from "nanoid";
 export { Product } from "types/Product";
 
 const productTable = new db.Table(process.env.TABLE_NAME as string);
@@ -10,12 +11,21 @@ const productTable = new db.Table(process.env.TABLE_NAME as string);
  */
 
 export const createProduct = async (newProduct: Product): Promise<Product> => {
+  if (!newProduct.Id) {
+    newProduct.Id = nanoid();
+  }
   await saveProductDetails(newProduct);
+
   return newProduct;
 };
 
+export const editProduct = async (product: Product): Promise<Product> => {
+  await saveProductDetails(product);
+  return product;
+};
+
 const saveProductDetails = async (product: Product) => {
-  const { Name: SK_GSI_PK, ...item } = product;
+  const { Id: SK_GSI_PK, ...item } = product;
 
   const ProductToSave: db.IPutItem = {
     PK: "Products",
@@ -33,9 +43,10 @@ export const getProducts = async (): Promise<Product[]> => {
   const products: Product[] = [];
   if (items) {
     items.forEach((element) => {
-      const { SK_GSI_PK: productName } = element;
-      const { Price: price, Description: description, ImageURL: imageURL } = element;
+      const { SK_GSI_PK: productId } = element;
+      const { Price: price, Description: description, ImageURL: imageURL, Name: productName } = element;
       products.push({
+        Id: productId as string,
         Name: productName as string,
         Price: price as number,
         Description: description as string,
