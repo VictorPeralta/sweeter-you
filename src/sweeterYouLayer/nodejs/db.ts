@@ -10,6 +10,10 @@ export interface IPutItem {
   [key: string]: unknown;
 }
 
+interface IKeyValue {
+  [key: string]: any;
+}
+
 export class Table {
   private tablename: string;
   constructor(tablename: string) {
@@ -58,5 +62,12 @@ export class Table {
 
     const response = await docClient.scan(params).promise();
     return response.Items;
+  }
+
+  async get(hashKey: IKeyValue, sortKey: IKeyValue): Promise<DynamoDB.AttributeMap | undefined> {
+    const Key = { ...hashKey, ...sortKey };
+    const params = { TableName: this.tablename, Key };
+    const response = await docClient.get(params).promise();
+    return response.Item;
   }
 }

@@ -155,6 +155,18 @@ export class SweeterYouStack extends cdk.Stack {
       api: {
         httpApi: restAPI,
         methods: [apigw.HttpMethod.GET],
+        path: "/products",
+      },
+    });
+
+    const getProductFunction = new syLambdaFunction(this, "syGetProductFunction", {
+      functionId: "GetProductsFunction",
+      layers: [helpersLayer],
+      srcPath: "src/products/getProductFunction",
+      tableName: sweeterYouTable.tableName,
+      api: {
+        httpApi: restAPI,
+        methods: [apigw.HttpMethod.GET],
         path: "/products/{productId}",
       },
     });
@@ -178,6 +190,7 @@ export class SweeterYouStack extends cdk.Stack {
     sweeterYouTable.grantWriteData(createProductFunction.function);
     sweeterYouTable.grantReadData(getProductsFunction.function);
     sweeterYouTable.grantWriteData(editProductFunction.function);
+    sweeterYouTable.grantReadData(getProductFunction.function);
     //#endregion
 
     //#endregion

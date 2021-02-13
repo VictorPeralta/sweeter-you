@@ -56,3 +56,16 @@ export const getProducts = async (): Promise<Product[]> => {
   }
   return products;
 };
+
+export const getSingleProduct = async (productId: string): Promise<Product> => {
+  const item = await productTable.get({ PK: "Products" }, { SK_GSI_PK: productId });
+  if (!item) throw new Error(`Product ${productId} not found`);
+  const product: Product = {
+    Id: productId,
+    Description: item.Description as string,
+    Price: item.Price as number,
+    ImageURL: item.ImageURL as string,
+    Name: item.Name as string,
+  };
+  return product;
+};
