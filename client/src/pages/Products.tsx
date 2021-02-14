@@ -18,7 +18,7 @@ export default function Products() {
 
   return (
     <>
-      <Heading>Products</Heading>
+      <Heading mb={8}>Products</Heading>
       <Flex justifyContent="flex-end" w="100%">
         <Link to="/admin/products/create">
           <Button>New Product</Button>

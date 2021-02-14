@@ -1,4 +1,4 @@
-import React, { useState, ChangeEvent } from "react";
+import React, { useState, ChangeEvent, useEffect } from "react";
 import {
   FormLabel,
   Input,
@@ -18,17 +18,34 @@ import {
   Heading,
 } from "@chakra-ui/react";
 import { UploadPublicFileToS3 } from "../services/s3service";
-import { CreateProduct as CreateProductFunction } from "../services/productService";
+import { EditProduct as EditProductFunction, GetProduct, DeleteProduct } from "../services/productService";
+import { Product } from "../../../types/Product";
+import { useRouteMatch, useHistory } from "react-router-dom";
 import ProductForm from "../components/products/ProductForm";
-import { useHistory } from "react-router-dom";
+import DeleteProductButton from "../components/products/DeleteProductButton";
 
-export default function CreateProduct() {
+export default function EditProduct() {
+  let match = useRouteMatch<{ productId: string }>();
+  let productId = match.params.productId;
+
+  const history = useHistory();
+
   const [name, setName] = useState("");
   const [price, setPrice] = useState(0);
   const [description, setDescription] = useState("");
   const [imgUrl, setImgUrl] = useState("");
   const [error, setError] = useState("");
-  const history = useHistory();
+
+  useEffect(() => {
+    async function fetchProduct(productId: string) {
+      const product: Product = await GetProduct(productId);
+      setPrice(product.Price);
+      setDescription(product.Description);
+      setName(product.Name);
+      setImgUrl(product.ImageURL);
+    }
+    fetchProduct(productId);
+  }, [productId]);
 
   async function handleImageUpload(e: ChangeEvent<HTMLInputElement>) {
     if (e.target.files && e.target.files[0]) {
@@ -42,9 +59,19 @@ export default function CreateProduct() {
     }
   }
 
+  async function handleDeleteProduct() {
+    await DeleteProduct(productId);
+    history.push("/admin/products");
+  }
+
   return (
     <>
-      <Heading mb={8}>New Product</Heading>
+      <Heading mb={8}>Edit Product</Heading>
+      <Flex justifyContent="flex-end">
+        <DeleteProductButton name={name} confirmedFunction={handleDeleteProduct}>
+          Delete Product
+        </DeleteProductButton>
+      </Flex>
       {error ? (
         <Alert status="error" mb="2">
           <AlertTitle>Something went wrong</AlertTitle>
@@ -55,8 +82,7 @@ export default function CreateProduct() {
       <ProductForm
         onSubmit={async (e) => {
           e.preventDefault();
-          console.log("submit");
-          await CreateProductFunction({ Name: name, Price: price, Description: description, ImageURL: imgUrl });
+          await EditProductFunction({ Id: productId, Name: name, Price: price, Description: description, ImageURL: imgUrl });
           history.push("/admin/products");
         }}
         description={description}

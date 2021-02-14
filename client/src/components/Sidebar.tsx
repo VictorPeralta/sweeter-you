@@ -4,6 +4,7 @@ import { Link as RouterLink, Route, useRouteMatch } from "react-router-dom";
 import OpenOrders from "../pages/OpenOrders";
 import Products from "../pages/Products";
 import CreateProduct from "../pages/CreateProduct";
+import EditProduct from "../pages/EditProduct";
 
 export default function Sidebar() {
   let match = useRouteMatch();
@@ -45,6 +46,9 @@ export default function Sidebar() {
         </Route>
         <Route exact path="/admin/products/create">
           <CreateProduct />
+        </Route>
+        <Route exact path="/admin/products/edit/:productId">
+          <EditProduct />
         </Route>
       </Container>
     </Box>

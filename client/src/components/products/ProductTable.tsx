@@ -22,7 +22,7 @@ const ProductTable = ({ products }: { products: Product[] }) => {
               .sort((a, b) => (a.Name > b.Name ? 1 : -1))
               .map((Product) => {
                 return (
-                  <Tr key={Product.Name}>
+                  <Tr key={Product.Id}>
                     <Td>
                       <Image src={Product.ImageURL} boxSize="100px" />
                     </Td>
@@ -30,7 +30,7 @@ const ProductTable = ({ products }: { products: Product[] }) => {
                     <Td>{Product.Price}</Td>
                     <Td>{Product.Description}</Td>
                     <Td textAlign="right">
-                      <Link to={`/admin/products/edit/${Product.Name}`}>
+                      <Link to={`/admin/products/edit/${Product.Id}`}>
                         <Text textColor="pink.400" _hover={{ textColor: "pink.500" }}>
                           Details
                         </Text>
@@ -42,7 +42,7 @@ const ProductTable = ({ products }: { products: Product[] }) => {
           </Tbody>
         </Table>
       ) : (
-        <h3>Loading data</h3>
+        <Text>No products to show</Text>
       )}
     </div>
   );
