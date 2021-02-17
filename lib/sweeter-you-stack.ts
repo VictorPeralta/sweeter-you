@@ -208,6 +208,67 @@ export class SweeterYouStack extends cdk.Stack {
 
     //#endregion
 
+    //#region LocationTime Functions
+    //#region Functions
+    const createLocationTimeFunction = new syLambdaFunction(this, "syCreateLocationTimeFunction", {
+      api: {
+        httpApi: restAPI,
+        methods: [apigw.HttpMethod.POST],
+        path: "/locations",
+      },
+      functionId: "CreateLocationTimeFunction",
+      srcPath: "src/locations/create",
+      tableName: sweeterYouTable.tableName,
+      layers: [helpersLayer],
+    });
+
+    const getLocationsFunction = new syLambdaFunction(this, "syGetLocationsTimeFunction", {
+      api: {
+        httpApi: restAPI,
+        methods: [apigw.HttpMethod.GET],
+        path: "/locations",
+      },
+      functionId: "CreateLocationTimeFunction",
+      srcPath: "src/locations/getLocations",
+      tableName: sweeterYouTable.tableName,
+      layers: [helpersLayer],
+    });
+
+    const getLocationFunction = new syLambdaFunction(this, "syGetLocationFunction", {
+      functionId: "GetLocationsFunction",
+      layers: [helpersLayer],
+      srcPath: "src/Locations/getLocation",
+      tableName: sweeterYouTable.tableName,
+      api: {
+        httpApi: restAPI,
+        methods: [apigw.HttpMethod.GET],
+        path: "/locations/{locationId}",
+      },
+    });
+
+    const EditLocationFunction = new syLambdaFunction(this, "syEditLocationFunction", {
+      functionId: "EditLocationsFunction",
+      layers: [helpersLayer],
+      srcPath: "src/Locations/edit",
+      tableName: sweeterYouTable.tableName,
+      api: {
+        httpApi: restAPI,
+        methods: [apigw.HttpMethod.PUT],
+        path: "/locations/{locationId}",
+      },
+    });
+    //#endregion
+
+    //#region Permissions
+    sweeterYouTable.grantWriteData(createLocationTimeFunction.function);
+    sweeterYouTable.grantReadData(getLocationsFunction.function);
+    sweeterYouTable.grantReadData(getLocationFunction.function);
+    sweeterYouTable.grantWriteData(EditLocationFunction.function);
+
+    //#endregion
+
+    //#endregion
+
     //#region Outputs
     new CfnOutput(this, "DevStgUrl", {
       value: devStg.url,
