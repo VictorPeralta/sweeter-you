@@ -257,6 +257,18 @@ export class SweeterYouStack extends cdk.Stack {
         path: "/locations/{locationId}",
       },
     });
+
+    const DeleteLocationFunction = new syLambdaFunction(this, "syDeleteLocationFunction", {
+      functionId: "DeleteLocationsFunction",
+      layers: [helpersLayer],
+      srcPath: "src/Locations/delete",
+      tableName: sweeterYouTable.tableName,
+      api: {
+        httpApi: restAPI,
+        methods: [apigw.HttpMethod.DELETE],
+        path: "/locations/{locationId}",
+      },
+    });
     //#endregion
 
     //#region Permissions
@@ -264,7 +276,7 @@ export class SweeterYouStack extends cdk.Stack {
     sweeterYouTable.grantReadData(getLocationsFunction.function);
     sweeterYouTable.grantReadData(getLocationFunction.function);
     sweeterYouTable.grantWriteData(EditLocationFunction.function);
-
+    sweeterYouTable.grantWriteData(DeleteLocationFunction.function);
     //#endregion
 
     //#endregion
