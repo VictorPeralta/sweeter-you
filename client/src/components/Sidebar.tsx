@@ -5,6 +5,8 @@ import OpenOrders from "../pages/OpenOrders";
 import Products from "../pages/Products";
 import CreateProduct from "../pages/CreateProduct";
 import EditProduct from "../pages/EditProduct";
+import Locations from "../pages/Locations";
+import CreateLocation from "../pages/CreateLocation";
 
 export default function Sidebar() {
   let match = useRouteMatch();
@@ -36,6 +38,13 @@ export default function Sidebar() {
             </Link>
           </RouterLink>
         </Box>
+        <Box>
+          <RouterLink to="/admin/locations">
+            <Link mx="4" mb={6} as="div">
+              Delivery Location & Time
+            </Link>
+          </RouterLink>
+        </Box>
       </Box>
       <Container maxW="1200px" mt="4" textColor="gray.800" as="main">
         <Route exact path="/admin/orders">
@@ -49,6 +58,12 @@ export default function Sidebar() {
         </Route>
         <Route exact path="/admin/products/edit/:productId">
           <EditProduct />
+        </Route>
+        <Route exact path="/admin/locations">
+          <Locations />
+        </Route>
+        <Route exact path="/admin/locations/create">
+          <CreateLocation />
         </Route>
       </Container>
     </Box>

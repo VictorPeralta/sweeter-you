@@ -1,22 +1,5 @@
 import React, { useState, ChangeEvent } from "react";
-import {
-  FormLabel,
-  Input,
-  FormControl,
-  Container,
-  Button,
-  Stack,
-  Box,
-  Flex,
-  Image,
-  FormHelperText,
-  Center,
-  Alert,
-  AlertTitle,
-  AlertDescription,
-  CloseButton,
-  Heading,
-} from "@chakra-ui/react";
+import { Alert, AlertTitle, AlertDescription, CloseButton, Heading } from "@chakra-ui/react";
 import { UploadPublicFileToS3 } from "../services/s3service";
 import { CreateProduct as CreateProductFunction } from "../services/productService";
 import ProductForm from "../components/products/ProductForm";
